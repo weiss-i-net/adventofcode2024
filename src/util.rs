@@ -48,6 +48,7 @@ pub fn get_counter<T: Eq + std::hash::Hash + Clone>(list: &[T]) -> HashMap<T, i3
     counter
 }
 
+#[allow(dead_code)]
 pub fn cached<Arg: Eq + std::hash::Hash + Clone, Ret: Clone>(
     mut f: impl FnMut(Arg) -> Ret,
 ) -> impl FnMut(Arg) -> Ret {

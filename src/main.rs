@@ -12,8 +12,10 @@ static AOC_YEAR: i32 = 2024;
 
 #[derive(Parser)]
 struct Arguments {
-    #[arg(short, long, default_value = get_latest_day().to_string())]
-    day: i32,
+    #[arg(short, long, default_value = get_latest_day().to_string(), group = "'day", num_args = 1..)]
+    day: Vec<i32>,
+    #[arg(short, long, group = "'day")]
+    all: bool,
     #[arg(short, long, group = "input")]
     input_string: Option<String>,
     #[arg(short, long, group = "input")]
@@ -81,23 +83,41 @@ fn main() {
         println!("downloading input for day {}...", day);
         download_input(day);
     }
-
-    // Get input from stdin, a string argument, or a file.
-    let input = if args.from_stdin {
-        let mut buffer = String::new();
-        std::io::stdin().read_to_string(&mut buffer).unwrap();
-        buffer
-    } else if let Some(input_string) = args.input_string {
-        input_string
+    let mut days = if !args.all {
+        args.day
     } else {
-        let path = format!("input/day_{:02}.txt", args.day);
-        std::fs::read_to_string(path).unwrap()
+        (1..=get_latest_day()).collect()
+    };
+    days.sort();
+
+    let has_special_input = args.input_string.is_some() || args.from_stdin;
+    let inputs = if days.len() == 1 && has_special_input {
+        if args.from_stdin {
+            let mut input = String::new();
+            std::io::stdin().read_to_string(&mut input).unwrap();
+            vec![input]
+        } else {
+            vec![args.input_string.unwrap()]
+        }
+    } else {
+        days.iter()
+            .map(|day| {
+                let mut input = String::new();
+                File::open(format!("input/day_{:02}.txt", day))
+                    .unwrap()
+                    .read_to_string(&mut input)
+                    .unwrap();
+                input
+            })
+            .collect()
     };
 
-    // Run the solver for the given day and part.
-    println!("running day {}...", args.day);
-    for part in [1, 2] {
-        let answer = get_solver(args.day, part)(&input);
-        println!("  {} (part {})", answer, part);
+    for (day, input) in days.into_iter().zip(inputs.into_iter()) {
+        // Run the solver for the given day and part.
+        println!("running day {}...", day);
+        for part in [1, 2] {
+            let answer = get_solver(day, part)(&input);
+            println!("  {} (part {})", answer, part);
+        }
     }
 }

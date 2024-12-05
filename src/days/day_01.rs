@@ -1,10 +1,10 @@
 use crate::util::get_counter;
+use crate::util::it_to_tuple;
 use crate::util::parse_grid_cols;
-use crate::util::vec_to_tuple;
 
 pub fn part_1(input: &str) -> String {
     let grid = parse_grid_cols::<i32>(input);
-    let (mut list_a, mut list_b) = vec_to_tuple!(grid, 2);
+    let (mut list_a, mut list_b) = it_to_tuple!(grid, 2);
     list_a.sort();
     list_b.sort();
     let difference_sum = list_a
@@ -16,7 +16,7 @@ pub fn part_1(input: &str) -> String {
 
 pub fn part_2(input: &str) -> String {
     let grid = parse_grid_cols::<i32>(input);
-    let (list_a, list_b) = vec_to_tuple!(grid, 2);
+    let (list_a, list_b) = it_to_tuple!(grid, 2);
 
     let counts = get_counter(&list_b);
     let similarity_score: i32 = list_a

@@ -65,16 +65,23 @@ pub fn cached<Arg: Eq + std::hash::Hash + Clone, Ret: Clone>(
 }
 
 macro_rules! vec_to_tuple {
-    ($vec:expr, $n:literal) => {
+    ($vec:expr, $n:literal) => {{
+        crate::util::it_to_tuple!($vec, $n)
+    }};
+}
+pub(crate) use vec_to_tuple;
+
+macro_rules! it_to_tuple {
+    ($it:expr, $n:literal) => {
         seq_macro::seq!(_ in 0..$n {
             {
-                let mut it = $vec.into_iter();
+                let mut it = $it.into_iter();
                 (#(it.next().unwrap(),)*)
             }
         })
     }
 }
-pub(crate) use vec_to_tuple;
+pub(crate) use it_to_tuple;
 
 #[cfg(test)]
 mod tests {

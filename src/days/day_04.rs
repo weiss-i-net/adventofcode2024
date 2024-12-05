@@ -6,8 +6,8 @@ pub fn part_1(input: &str) -> String {
 
     let check = |y: usize, x: usize, dx: i32, dy: i32, target: &[u8]| {
         for i in 0..4 {
-            let yy = y as i32 + i*dy;
-            let xx = x as i32 + i*dx;
+            let yy = y as i32 + i * dy;
+            let xx = x as i32 + i * dx;
 
             if !(0 <= yy && yy < grid.len() as i32 && 0 <= xx && xx < grid[0].len() as i32) {
                 return false;
@@ -42,7 +42,7 @@ pub fn part_2(input: &str) -> String {
 
     let check = |y: usize, x: usize, t1: &[u8], t2: &[u8]| {
         for i in 0..3 {
-            if grid[y+i][x+i] != t1[i] || grid[y+i][x+2-i] != t2[i] {
+            if grid[y + i][x + i] != t1[i] || grid[y + i][x + 2 - i] != t2[i] {
                 return false;
             }
         }
@@ -51,8 +51,8 @@ pub fn part_2(input: &str) -> String {
 
     let mut count = 0;
 
-    for y in 0..grid.len()-2 {
-        for x in 0..grid[0].len()-2 {
+    for y in 0..grid.len() - 2 {
+        for x in 0..grid[0].len() - 2 {
             for &t1 in &targets {
                 for &t2 in &targets {
                     if check(y, x, t1, t2) {

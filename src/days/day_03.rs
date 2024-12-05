@@ -1,9 +1,12 @@
 pub fn part_1(input: &str) -> String {
     let re = regex::Regex::new(r"mul\((\d+),(\d+)\)").unwrap();
-    re.captures_iter(input).map(|c| {
-        let (_, [a, b]) = c.extract();
-        a.parse::<i32>().unwrap() * b.parse::<i32>().unwrap()
-    }).sum::<i32>().to_string()
+    re.captures_iter(input)
+        .map(|c| {
+            let (_, [a, b]) = c.extract();
+            a.parse::<i32>().unwrap() * b.parse::<i32>().unwrap()
+        })
+        .sum::<i32>()
+        .to_string()
 }
 
 pub fn part_2(input: &str) -> String {

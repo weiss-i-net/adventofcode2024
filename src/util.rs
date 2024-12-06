@@ -2,6 +2,11 @@ use std::collections::HashMap;
 use std::fmt::Debug;
 use std::str::FromStr;
 
+
+pub fn parse_char_grid(input: &str) -> Vec<Vec<char>> {
+    input.lines().map(|line| line.chars().collect()).collect()
+}
+
 pub fn parse_grid_rows<T>(input: &str) -> Vec<Vec<T>>
 where
     T: FromStr,
@@ -48,15 +53,27 @@ pub fn get_counter<T: Eq + std::hash::Hash + Clone>(list: &[T]) -> HashMap<T, i3
     counter
 }
 
+pub fn indexes(n: usize, m: usize) -> impl Iterator<Item = (usize, usize)> {
+    (0..n).flat_map(move |i| (0..m).map(move |j| (i, j)))
+}
+
+pub fn get_in_range_fn(n: usize, m: usize) -> impl Fn(usize, usize) -> bool {
+    move |i, j| (0..n).contains(&i) && (0..m).contains(&j)
+}
+
 #[allow(dead_code)]
 pub fn cached<Arg: Eq + std::hash::Hash + Clone, Ret: Clone>(
     mut f: impl FnMut(Arg) -> Ret,
 ) -> impl FnMut(Arg) -> Ret {
     let mut cache: HashMap<Arg, Ret> = HashMap::new();
+    // we have return an owned value as closures can not return refereneces to captured
+    // variables
     move |arg| {
         if let Some(ret) = cache.get(&arg) {
             ret.clone()
         } else {
+            // if Arg is a reference .clone() returnes a reference as in that case no
+            // automatic deref on method call is done
             let ret = f(arg.clone());
             cache.insert(arg, ret.clone());
             ret
@@ -135,13 +152,13 @@ mod tests {
     #[test]
     fn test_vec_to_tuple() {
         let input = vec![1, 2, 3, 4, 5, 6];
-        let (a, b, c) = vec_to_tuple!(input, 3);
+        let (a, b, c) = it_to_tuple!(input, 3);
         assert_eq!(a, 1);
         assert_eq!(b, 2);
         assert_eq!(c, 3);
 
         let input = vec![1, 2, 3, 4, 5, 6];
-        let (a, b, c, d, e, f) = vec_to_tuple!(input, 6);
+        let (a, b, c, d, e, f) = it_to_tuple!(input, 6);
         assert_eq!(a, 1);
         assert_eq!(b, 2);
         assert_eq!(c, 3);

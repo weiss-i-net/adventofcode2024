@@ -16,13 +16,12 @@ fn is_good(target: u64, curr_value: u64, nums: &[u64], is_part_2: bool) -> bool 
 fn solve(input: &str, is_part_2: bool) -> String {
     input
         .lines()
-        .map(|l| {
+        .filter_map(|l| {
             let mut it = l.split_whitespace();
             let target = it.next().unwrap().trim_end_matches(':').parse().unwrap();
-            let nums = it.map(|s| s.parse().unwrap()).collect::<Vec<_>>();
-            (target, nums)
+            let nums: Vec<_> = it.map(|s| s.parse().unwrap()).collect();
+            is_good(target, *nums.first().unwrap(), &nums[1..], is_part_2).then_some(target)
         })
-        .filter_map(|(t, n)| is_good(t, *n.first().unwrap(), &n[1..], is_part_2).then(|| t))
         .sum::<u64>()
         .to_string()
 }

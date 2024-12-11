@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 pub fn get_files(input: &str) -> Vec<(u64, u64, u64)> {
     let mut files = Vec::with_capacity(input.len() / 2);
     let mut is_file = true;
@@ -14,6 +16,13 @@ pub fn get_files(input: &str) -> Vec<(u64, u64, u64)> {
         is_file = !is_file;
     }
     files
+}
+
+fn get_checksum(files: &[(u64, u64, u64)]) -> u64 {
+    files
+        .iter()
+        .map(|(id, pos, len)| id * (len * pos + (len - 1) * len / 2))
+        .sum::<u64>()
 }
 
 pub fn part_1(input: &str) -> String {
@@ -39,14 +48,31 @@ pub fn part_1(input: &str) -> String {
         }
     }
 
-    compacted_files
-        .into_iter()
-        .map(|(id, pos, len)| id * (len * pos + (len - 1) * len / 2))
-        .sum::<u64>()
-        .to_string()
+    get_checksum(&compacted_files).to_string()
 }
 
-#[allow(unused_variables)]
 pub fn part_2(input: &str) -> String {
-    String::new()
+    // idea copied from reddit: https://old.reddit.com/r/adventofcode/comments/1ha27bo/2024_day_9_solutions/m15sexj/
+    let mut files = get_files(input);
+    let mut spaces: Vec<_> = files
+        .iter()
+        .tuple_windows()
+        .map(|((_, pos1, len1), (_, pos2, _))| (pos1 + len1, pos2 - pos1 - len1))
+        .collect();
+
+    for i in (0..files.len()).rev() {
+        let (id, pos, len) = files[i];
+        for (j, &(s_pos, s_len)) in spaces.iter().enumerate() {
+            if s_len >= len {
+                files[i] = (id, s_pos, len);
+                spaces[j] = (s_pos + len, s_len - len);
+                break;
+            }
+            if s_pos >= pos {
+                break;
+            }
+        }
+    }
+
+    get_checksum(&files).to_string()
 }
